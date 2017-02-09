@@ -70,12 +70,31 @@ public class SidewinderCollectdWriter implements CollectdWriteInterface, Collect
 					tagStr.append("," + tag);
 				}
 				String tagStrCnst = tagStr.toString();
-				for (DataSource dataSource : val.getDataSet().getDataSources()) {
-					builder.append(measurement + tagStrCnst + " " + valueFieldName + "=" + dataSource.getMin() + " "
-							+ val.getTime() + "\n");
+				for (int j = 0; j < val.getDataSet().getDataSources().size(); j++) {
+					DataSource dataSource = val.getDataSet().getDataSources().get(j);
+					int type = dataSource.getType();
+					String typeStr = null;
+					switch (type) {
+					case DataSource.TYPE_ABSOLUTE:
+						typeStr = "absolute";
+						break;
+					case DataSource.TYPE_COUNTER:
+						typeStr = "counter";
+						break;
+					case DataSource.TYPE_DERIVE:
+						typeStr = "derive";
+						break;
+					case DataSource.TYPE_GAUGE:
+						typeStr = "gauge";
+						break;
+					default:
+						typeStr = "unknown";
+					}
+
+					builder.append(measurement + tagStrCnst + ",type=" + typeStr + " " + valueFieldName + "_"
+							+ dataSource.getName() + "=" + val.getValues().get(j) + " " + val.getTime() + "\n");
 				}
 			}
-//			System.out.println("Sidewinder output:\n" + builder.toString());
 			for (String url : urls) {
 				CloseableHttpClient client = HttpClientBuilder.create().build();
 				HttpPost post = new HttpPost(url);
@@ -96,7 +115,8 @@ public class SidewinderCollectdWriter implements CollectdWriteInterface, Collect
 						return -1;
 					}
 				}
-//				System.out.println("Returning 0 "+System.currentTimeMillis());
+				// System.out.println("Returning 0
+				// "+System.currentTimeMillis());
 			}
 			batch.clear();
 		}
