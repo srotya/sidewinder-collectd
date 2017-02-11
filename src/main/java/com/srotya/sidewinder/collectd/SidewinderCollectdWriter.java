@@ -58,11 +58,11 @@ public class SidewinderCollectdWriter implements CollectdWriteInterface, Collect
 				String src = val.getSource();
 				String[] splits = src.split("/");
 				String host = splits[0];
-				String measurement = splits[splits.length - 2];
+				String measurement = splits[1];
 				String valueFieldName = splits[splits.length - 1];
 				List<String> tags = new ArrayList<>();
 				tags.add(host);
-				for (int i = 1; i < splits.length - 2; i++) {
+				for (int i = 2; i < splits.length - 1; i++) {
 					tags.add(splits[i]);
 				}
 				StringBuilder tagStr = new StringBuilder();
